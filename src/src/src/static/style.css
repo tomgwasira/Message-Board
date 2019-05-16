@@ -1,0 +1,46 @@
+/* ================================================================== CSS RULES ==========================================================================
+/*** 1. Fonts ***/
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,500,600,700');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
+
+.grid-2 {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	width: 100vw !important;
+}
+
+h1 {
+	color: #333;
+	font-family: 'Raleway', sans-serif;
+	font-size: 50px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 5px;
+}
+
+h2 {
+	color: #000;
+	font-family: 'Roboto', sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+h3 {
+	font-size: 15px;
+	font-family: 'Roboto', sans-serif;
+}
+
+li {
+	font-family: 'Roboto', sans-serif;
+	font-size: 13px;
+}
+
+.message-section {
+	margin-top: 80px;
+}
+
+.message-format {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+

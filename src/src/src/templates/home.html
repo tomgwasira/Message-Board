@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block body %}
+	<!-- While not logged in -->
+	<div class="jumbotron text-center">
+		<h1>Welcome to the Citiq Prepaid Forum</h1>
+		{% if session.logged_in %}
+		{% else %}
+		<p>Please login to continue:</p>
+		<a href="/register">Register</a>
+		<a href="/login">Log in</a>
+		{% endif %}
+	</div>
+{% endblock %}
