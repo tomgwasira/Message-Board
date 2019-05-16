@@ -21,6 +21,9 @@ api = Api(app)
 now = datetime.now()
 date_time = now.strftime("%d.%m.%Y %H:%M")
 
+user_liked = ""
+user_disliked = ""
+
 @app.route('/')
 def index():
 	return redirect(url_for('login'))
@@ -136,7 +139,8 @@ def messages():
 	all_groups = []
 
 	for row in result:
-		all_groups.append(row[0])
+		if row[0] not in all_groups:
+			all_groups.append(row[0])
 
 	query = "SELECT groupname FROM groups WHERE username=?"
 	result = cursor.execute(query, (current_user,))
@@ -154,7 +158,7 @@ def messages():
 	messages = []
 
 	for row in result:
-		messages.append({'name':row[0], 'message_content':row[1], 'vote_count':row[2], 'group_':row[3], 'creator':row[4], 'date_created':row[5]})
+		messages.append({'name':row[0], 'message_content':row[1], 'likes':row[2], 'dislikes':row[3], 'group_':row[4], 'creator':row[5], 'date_created':row[6]})
 
 	connection.close()
 
@@ -190,7 +194,8 @@ def add_message():
 	if request.method == 'POST' and form.validate():
 		name = form.name.data
 		message_content = form.message_content.data
-		vote_count = 0
+		likes = 0
+		dislikes = 0 
 		group_ = form.group_.data
 		current_user = session['username']
 		global date_time
@@ -205,8 +210,8 @@ def add_message():
 			
 		else:
 			if group_ in groups:
-				query = "INSERT INTO messages VALUES (?, ?, ?, ?, ?, ?)"
-				cursor.execute(query, (name, message_content, vote_count, group_, current_user, date_time))
+				query = "INSERT INTO messages VALUES (?, ?, ?, ?, ?, ?, ?)"
+				cursor.execute(query, (name, message_content, likes, dislikes, group_, current_user, date_time))
 
 				connection.commit()
 				flash('Message posted', 'success')
@@ -227,17 +232,26 @@ def add_message():
 def upvote(id):
 	current_user = session['username']
 	name=id
+	global user_liked
+	global user_disliked
 
-	connection = sqlite3.connect('message_board.db')
-	cursor = connection.cursor()
+	if user_liked != current_user:
+		connection = sqlite3.connect('message_board.db')
+		cursor = connection.cursor()
 
-	query = "UPDATE messages SET vote_count=vote_count+1 WHERE name=?"
-	cursor.execute(query, (name,))
-		
-	connection.commit()
-	connection.close()
+		query = "UPDATE messages SET likes=likes+1 WHERE name=?"
+		cursor.execute(query, (name,))
+		connection.commit()
 
-	flash('Done', 'success')
+		if user_disliked == current_user:
+			query = "UPDATE messages SET dislikes=dislikes-1 WHERE name=?"
+			cursor.execute(query, (name,))
+			connection.commit()
+
+		connection.close()
+
+		user_liked = current_user
+		user_disliked = ""
 
 	return redirect(url_for('messages'))
 
@@ -248,16 +262,26 @@ def downvote(id):
 	current_user = session['username']
 	name=id
 
-	connection = sqlite3.connect('message_board.db')
-	cursor = connection.cursor()
+	global user_liked
+	global user_disliked
 
-	query = "UPDATE messages SET vote_count=vote_count-1 WHERE name=?"
-	cursor.execute(query, (name,))
-		
-	connection.commit()
-	connection.close()
+	if user_disliked != current_user:
+		connection = sqlite3.connect('message_board.db')
+		cursor = connection.cursor()
 
-	flash('Done', 'success')
+		query = "UPDATE messages SET dislikes=dislikes+1 WHERE name=?"
+		cursor.execute(query, (name,))
+		connection.commit()
+
+		if user_liked == current_user:
+			query = "UPDATE messages SET likes=likes-1 WHERE name=?"
+			cursor.execute(query, (name,))
+			connection.commit()
+
+		connection.close()
+
+		user_disliked = current_user
+		user_liked = ""
 
 	return redirect(url_for('messages'))
 
@@ -277,7 +301,7 @@ def delete_message(id):
 	connection.commit()
 	connection.close()
 
-	flash('Message deleted.', 'success')
+	#flash('Message deleted.', 'success')
 
 	return redirect(url_for('messages'))
 
@@ -306,7 +330,7 @@ def join_group(id):
 		connection.commit()
 		connection.close()
 
-		flash('Joined group.', 'success')
+		flash('You have joined the group '+groupname+'.', 'success')
 
 	return redirect(url_for('messages'))
 
@@ -327,7 +351,7 @@ def leave_group(id):
 	connection.commit()
 	connection.close()
 
-	flash('Left group.', 'success')
+	flash('You have left the group '+groupname+'.', 'success')
 
 	return redirect(url_for('messages'))
 

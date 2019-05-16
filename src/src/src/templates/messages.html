@@ -7,29 +7,29 @@
 		{% if session.logged_in %}
 		<ul class="list-group message-format" style="list-style: none;">
 		{% for message in messages%}
-			<h3 style="font-size: 15px;">{{ message.name }}</h3>
+			<h3 style="font-size: 18px;">{{ message.name }}</h3>
 			<li class="list-group-item">
-				<span>
+				<span style="color: #a0a0a0;">
 					Posted by: {{ message.creator }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					Date: {{ message.date_created }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					{{ message.vote_count }}&nbsp;
-					<i class="fas fa-heart" style="color: #c0c0c0;"></i>
 				</span>
 				<br>
 				<br>
-				<div>{{ message.message_content}}</div>
+				<div style="font-size: 14px;">{{ message.message_content}}</div>
 			</li>
 			
 			<ul class="text-right" style="margin-bottom: 20px;">
 				<li style="display: inline-block;">
 					<form action="{{ url_for('upvote', id=message.name) }}" method="post">
 						<input type="hidden" name="_method" value="UPVOTE">
-						<button type="submit" style="color: #696969; border: none; background: none;"><i class="fas fa-thumbs-up"></i></button>
+						{{ message.likes }}&nbsp;
+						<button type="submit" style="color: #696969; border: none; background: none;"><i class="fas fa-thumbs-up"></i></button>&nbsp;&nbsp;
 					</form>
 				</li>
 				<li style="display: inline-block;">
 					<form action="{{ url_for('downvote', id=message.name) }}" method="post">
 						<input type="hidden" name="_method" value="DOWNVOTE">
+						{{ message.dislikes }}&nbsp;
 						<button type="submit" style="color: #696969; border: none; background: none;"><i class="fas fa-thumbs-down"></i></button>
 					</form>
 				</li>
@@ -63,10 +63,10 @@
 		<li style="display: inline-block;"><h2 style="font-size: 15px;">Join Groups:</h2></li>
 		<li style="display: inline-block;">
 			<ul>
-				{% for groupname in all_groups %}
+				{% for groupname_all in all_groups %}
 					<li style="display: inline-block; margin-right: 15px; color: #696969;">
-						<form action="{{ url_for('join_group', id=groupname) }}" method="post">
-							{{ groupname }}
+						<form action="{{ url_for('join_group', id=groupname_all) }}" method="post">
+							{{ groupname_all }}
 							<input type="hidden" name="_method" value="JOIN_GROUP">
 							<button type="submit" name="" style="border: none; background: none; color: #333;"><i class="fas fa-plus" style="font-size: 12px;"></i></button>
 						</form>
