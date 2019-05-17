@@ -2,7 +2,6 @@ import time
 import datetime
 import sqlite3
 from flask import Flask, render_template, flash, request, redirect, url_for, session, logging
-from flask_restful import Api
 from datetime import datetime, timedelta
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -16,13 +15,16 @@ from messages import Messages
 
 app = Flask(__name__)
 app.secret_key = 'complicated'
-api = Api(app)
+#api = Api(app)
 
 now = datetime.now()
 date_time = now.strftime("%d.%m.%Y %H:%M")
 
 user_liked = ""
 user_disliked = ""
+
+liked = {}
+disliked = {}
 
 @app.route('/')
 def index():
@@ -232,26 +234,33 @@ def add_message():
 def upvote(id):
 	current_user = session['username']
 	name=id
-	global user_liked
-	global user_disliked
-
-	if user_liked != current_user:
+	
+	global liked
+	global disliked
+	
+	if not current_user in liked:
+		liked[current_user]=[]
+	if not current_user in disliked:
+		disliked[current_user]=[]
+	
+	if name not in liked[current_user]:
 		connection = sqlite3.connect('message_board.db')
 		cursor = connection.cursor()
-
+	
 		query = "UPDATE messages SET likes=likes+1 WHERE name=?"
 		cursor.execute(query, (name,))
 		connection.commit()
-
-		if user_disliked == current_user:
+		
+		if name in disliked[current_user]:
 			query = "UPDATE messages SET dislikes=dislikes-1 WHERE name=?"
 			cursor.execute(query, (name,))
 			connection.commit()
-
+			
+			disliked[current_user].remove(name)
+		
+		liked[current_user].append(name)
+		
 		connection.close()
-
-		user_liked = current_user
-		user_disliked = ""
 
 	return redirect(url_for('messages'))
 
@@ -262,26 +271,32 @@ def downvote(id):
 	current_user = session['username']
 	name=id
 
-	global user_liked
-	global user_disliked
+	global liked
+	global disliked
 
-	if user_disliked != current_user:
+	if not current_user in liked:
+		liked[current_user]=[]
+	if not current_user in disliked:
+		disliked[current_user]=[]
+	
+	if name not in disliked[current_user]:
 		connection = sqlite3.connect('message_board.db')
 		cursor = connection.cursor()
-
+	
 		query = "UPDATE messages SET dislikes=dislikes+1 WHERE name=?"
 		cursor.execute(query, (name,))
 		connection.commit()
-
-		if user_liked == current_user:
+		
+		disliked[current_user].append(name)
+		
+		if name in liked[current_user]:
 			query = "UPDATE messages SET likes=likes-1 WHERE name=?"
 			cursor.execute(query, (name,))
 			connection.commit()
-
+			
+			liked[current_user].remove(name)
+			
 		connection.close()
-
-		user_disliked = current_user
-		user_liked = ""
 
 	return redirect(url_for('messages'))
 

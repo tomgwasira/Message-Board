@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h4 style="font-size: 25px !important; margin-top: 25px;">Add Message</h1>
+  <div class="container" style="width: 700px; margin: auto;">
+    <h4 style="font-size: 25px !important; margin-top: 90px;">Add Message</h1>
   {% from "includes/_formhelpers.html" import render_field %}
   <form method="POST" action="">
     <div class="form-group">
@@ -15,4 +16,5 @@
     </div>
     <p><input class="btn btn-primary" type="submit" value="Submit">
   </form>
-{% endblock %}
+  </div>
+{% endblock %} 
