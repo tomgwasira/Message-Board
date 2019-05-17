@@ -1,10 +1,10 @@
 # Message-Board
 
 Install:
-flask
-WTForms
-Flask-RESTful
-passlib
+- flask
+- WTForms
+- Flask-RESTful
+- passlib
 
 Notes:
 - Ensure there is no database (named message-board.db) in project/src/src. Delete if one currently exists.
