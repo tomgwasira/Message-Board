@@ -1,4 +1,4 @@
-# Message-Board
+# Message Forum
 
 Install:
 - flask
